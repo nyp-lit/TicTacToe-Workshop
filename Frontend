@@ -5,18 +5,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Tic-Tac-Toe</title>
   <style>
+    /* Reset margin and set font for the entire body */
     body {
       margin: 0;
       font-family: Arial, sans-serif;
       text-align: center;
     }
 
+    /* Top branding bar */
     .top-bar {
       padding: 10px 0;
       font-size: 24px;
       font-weight: bold;
     }
 
+    /* Header below the top-bar */
     .header {
       background-color: #5C2D91;
       color: white;
@@ -24,18 +27,21 @@
       font-size: 20px;
     }
 
+    /* Player input spacing */
     .player-setup input {
       margin: 5px;
     }
 
+    /* 3x3 game board layout */
     .game-board {
       display: grid;
-      grid-template-columns: repeat(3, 100px);
-      grid-gap: 5px;
+      grid-template-columns: repeat(3, 100px); /* 3 columns of 100px each */
+      grid-gap: 5px; /* spacing between cells */
       justify-content: center;
       margin-top: 20px;
     }
 
+    /* Styling each tic-tac-toe cell */
     .cell {
       width: 100px;
       height: 100px;
@@ -47,6 +53,7 @@
       cursor: pointer;
     }
 
+    /* Style for all buttons */
     .btn {
       padding: 10px 20px;
       margin: 10px;
@@ -56,14 +63,18 @@
       cursor: pointer;
     }
 
+    /* Button hover effect */
     .btn:hover {
       background-color: #3881FF;
     }
   </style>
 </head>
 <body>
-  <div class="top-bar">LIT Logo</div>
+
+  <!-- Main header for the game -->
   <div class="header">Tic-Tac-Toe Demo</div>
+
+  <!-- Player name input section -->
   <div class="player-setup">
     <input type="text" id="player1" placeholder="Player 1 Name" />
     <button class="btn" onclick="setPlayer(1)">Set Player 1</button><br />
@@ -72,33 +83,53 @@
     <button class="btn" onclick="startGame()">Start Game</button>
     <button class="btn" onclick="resetGame()">Reset Game</button>
   </div>
+
+  <!-- Game board container -->
   <div class="game-board" id="board"></div>
 
   <script>
+    // Get the board container
     const boardEl = document.getElementById("board");
+
+    // Initialize the board with empty cells
     let board = Array(9).fill("");
+
+    // Start with player X
     let currentPlayer = "X";
+
+    // Default player names
     let players = { X: "Player 1", O: "Player 2" };
+
+    // Game state flag
     let gameActive = false;
 
+    // Draw the game board on screen
     function renderBoard() {
-      boardEl.innerHTML = "";
+      boardEl.innerHTML = ""; // Clear previous content
       board.forEach((cell, i) => {
         const cellEl = document.createElement("div");
         cellEl.className = "cell";
         cellEl.textContent = cell;
+
+        // Color X and O differently
         cellEl.style.color = cell === "X" ? "#E66EBB" : "#3881FF";
+
+        // Add click handler to cell
         cellEl.onclick = () => handleCellClick(i);
+
+        // Append cell to board
         boardEl.appendChild(cellEl);
       });
     }
 
+    // Set player name for X or O
     function setPlayer(num) {
       const input = document.getElementById(`player${num}`);
       if (num === 1) players.X = input.value || "Player 1";
       if (num === 2) players.O = input.value || "Player 2";
     }
 
+    // Start or restart the game
     function startGame() {
       board = Array(9).fill("");
       currentPlayer = "X";
@@ -106,6 +137,7 @@
       renderBoard();
     }
 
+    // Reset the board and stop the game
     function resetGame() {
       board = Array(9).fill("");
       currentPlayer = "X";
@@ -113,37 +145,49 @@
       renderBoard();
     }
 
+    // Handle a cell click during the game
     function handleCellClick(index) {
-      if (!gameActive || board[index]) return;
-      board[index] = currentPlayer;
-      renderBoard();
+      if (!gameActive || board[index]) return; // Ignore if game is off or cell filled
+
+      board[index] = currentPlayer; // Mark cell
+      renderBoard(); // Update UI
+
+      // Check for a winner
       if (checkWinner()) {
         alert(`${players[currentPlayer]} wins!`);
         gameActive = false;
         return;
       }
+
+      // Check for a tie (no empty cells)
       if (board.every(cell => cell !== "")) {
         alert("It's a tie!");
         gameActive = false;
         return;
       }
+
+      // Switch players
       currentPlayer = currentPlayer === "X" ? "O" : "X";
     }
 
+    // Winning logic: 8 possible win lines
     function checkWinner() {
       const wins = [
-        [0, 1, 2],
-        [3, 4, 5],
-        [6, 7, 8],
-        [0, 3, 6],
-        [1, 4, 7],
-        [2, 5, 8],
-        [0, 4, 8],
-        [2, 4, 6],
+        [0, 1, 2], // top row
+        [3, 4, 5], // middle row
+        [6, 7, 8], // bottom row
+        [0, 3, 6], // left column
+        [1, 4, 7], // middle column
+        [2, 5, 8], // right column
+        [0, 4, 8], // diagonal
+        [2, 4, 6], // reverse diagonal
       ];
+
+      // Check each winning line
       return wins.some(([a, b, c]) => board[a] && board[a] === board[b] && board[a] === board[c]);
     }
 
+    // Initial render of empty board
     renderBoard();
   </script>
 </body>

@@ -2,24 +2,26 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Tic-Tac-Toe</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Customizable Tic-Tac-Toe</title>
   <style>
-    /* Reset margin and set font for the entire body */
+    /* Basic reset and page styling */
     body {
       margin: 0;
       font-family: Arial, sans-serif;
       text-align: center;
     }
 
-    /* Top branding bar */
+    /* Top navigation bar */
     .top-bar {
-      padding: 10px 0;
+      background-color: #4A10A2;
+      color: white;
+      padding: 12px;
       font-size: 24px;
       font-weight: bold;
     }
 
-    /* Header below the top-bar */
+    /* Header just below top bar */
     .header {
       background-color: #5C2D91;
       color: white;
@@ -27,117 +29,173 @@
       font-size: 20px;
     }
 
-    /* Player input spacing */
-    .player-setup input {
+    /* Player setup and color picker input styling */
+    .player-setup input,
+    .player-setup select,
+    .player-setup label {
       margin: 5px;
+      padding: 8px;
     }
 
-    /* 3x3 game board layout */
+    .color-picker {
+      margin: 10px 0;
+    }
+
+    /* Tic-Tac-Toe board layout */
     .game-board {
       display: grid;
-      grid-template-columns: repeat(3, 100px); /* 3 columns of 100px each */
-      grid-gap: 5px; /* spacing between cells */
+      grid-template-columns: repeat(3, 100px); /* 3 columns */
+      gap: 5px; /* gap between cells */
       justify-content: center;
       margin-top: 20px;
     }
 
-    /* Styling each tic-tac-toe cell */
+    /* Individual cell (tile) styling */
     .cell {
       width: 100px;
       height: 100px;
       font-size: 36px;
-      background-color: #ccc;
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
+      border-radius: 5px;
     }
 
-    /* Style for all buttons */
+    /* Button styling */
     .btn {
       padding: 10px 20px;
-      margin: 10px;
+      margin: 10px 5px;
       background-color: #4A10A2;
       color: white;
       border: none;
+      border-radius: 5px;
       cursor: pointer;
+      font-weight: bold;
     }
 
-    /* Button hover effect */
+    /* Hover effect for buttons */
     .btn:hover {
       background-color: #3881FF;
     }
+
+    /* Scoreboard styling */
+    .scoreboard {
+      margin-top: 20px;
+    }
+
+    .scoreboard p {
+      font-size: 18px;
+    }
+
   </style>
 </head>
 <body>
 
-  <!-- Main header for the game -->
+  <!-- Top Branding -->
+  <div class="top-bar">LIT Logo</div>
   <div class="header">Tic-Tac-Toe Demo</div>
 
-  <!-- Player name input section -->
+  <!-- Player setup and color selection -->
   <div class="player-setup">
-    <input type="text" id="player1" placeholder="Player 1 Name" />
+    <!-- Player 1 Input -->
+    <input type="text" id="player1" placeholder="Player 1 Name (X)" />
     <button class="btn" onclick="setPlayer(1)">Set Player 1</button><br />
-    <input type="text" id="player2" placeholder="Player 2 Name" />
+    
+    <!-- Player 2 Input -->
+    <input type="text" id="player2" placeholder="Player 2 Name (O)" />
     <button class="btn" onclick="setPlayer(2)">Set Player 2</button><br />
+
+    <!-- Color Pickers -->
+    <div class="color-picker">
+      <label for="xColor">X Color: </label>
+      <input type="color" id="xColor" value="#E66EBB" />
+
+      <label for="oColor">O Color: </label>
+      <input type="color" id="oColor" value="#3881FF" />
+
+      <label for="boardColor">Board Background: </label>
+      <input type="color" id="boardColor" value="#4A10A2" />
+    </div>
+
+    <!-- Game control buttons -->
     <button class="btn" onclick="startGame()">Start Game</button>
     <button class="btn" onclick="resetGame()">Reset Game</button>
+    <button class="btn" onclick="restartScoreboard()">Restart Scoreboard</button>
+  </div>
+
+  <!-- Scoreboard -->
+  <div class="scoreboard">
+    <h3>Scoreboard</h3>
+    <p id="scoreX">Player 1 (X): 0</p>
+    <p id="scoreO">Player 2 (O): 0</p>
   </div>
 
   <!-- Game board container -->
   <div class="game-board" id="board"></div>
 
   <script>
-    // Get the board container
+    // DOM references
     const boardEl = document.getElementById("board");
+    const scoreXEl = document.getElementById("scoreX");
+    const scoreOEl = document.getElementById("scoreO");
 
-    // Initialize the board with empty cells
-    let board = Array(9).fill("");
+    // Game state variables
+    let board = Array(9).fill(""); // 9-cell empty board
+    let currentPlayer = "X"; // X starts
+    let gameActive = false; // Prevent play until game starts
 
-    // Start with player X
-    let currentPlayer = "X";
-
-    // Default player names
+    // Player names
     let players = { X: "Player 1", O: "Player 2" };
 
-    // Game state flag
-    let gameActive = false;
+    // Score tracking
+    let scores = { X: 0, O: 0 };
 
-    // Draw the game board on screen
+    // Function to render (draw) the board UI
     function renderBoard() {
-      boardEl.innerHTML = ""; // Clear previous content
+      boardEl.innerHTML = ""; // Clear previous cells
+
+      // Get current color values from color pickers
+      const xColor = document.getElementById("xColor").value;
+      const oColor = document.getElementById("oColor").value;
+      const boardBg = document.getElementById("boardColor").value;
+
+      // Loop through board cells and render each one
       board.forEach((cell, i) => {
         const cellEl = document.createElement("div");
         cellEl.className = "cell";
-        cellEl.textContent = cell;
+        cellEl.textContent = cell; // Show X or O
 
-        // Color X and O differently
-        cellEl.style.color = cell === "X" ? "#E66EBB" : "#3881FF";
+        // Set cell background to chosen board color
+        cellEl.style.backgroundColor = boardBg;
 
-        // Add click handler to cell
+        // Set X or O text color depending on current player
+        cellEl.style.color = cell === "X" ? xColor : cell === "O" ? oColor : "#000";
+
+        // When a cell is clicked, attempt to play
         cellEl.onclick = () => handleCellClick(i);
 
-        // Append cell to board
-        boardEl.appendChild(cellEl);
+        boardEl.appendChild(cellEl); // Add cell to the board
       });
     }
 
-    // Set player name for X or O
+    // Function to set a player's name
     function setPlayer(num) {
       const input = document.getElementById(`player${num}`);
       if (num === 1) players.X = input.value || "Player 1";
       if (num === 2) players.O = input.value || "Player 2";
+      updateScoreDisplay();
     }
 
-    // Start or restart the game
+    // Start new game
     function startGame() {
-      board = Array(9).fill("");
-      currentPlayer = "X";
-      gameActive = true;
-      renderBoard();
+      board = Array(9).fill(""); // Reset board
+      currentPlayer = "X";       // Start with X
+      gameActive = true;         // Enable clicks
+      renderBoard();             // Draw board
     }
 
-    // Reset the board and stop the game
+    // Reset game (same as start, but disables play)
     function resetGame() {
       board = Array(9).fill("");
       currentPlayer = "X";
@@ -145,50 +203,68 @@
       renderBoard();
     }
 
-    // Handle a cell click during the game
+    // Restart scoreboard
+    function restartScoreboard() {
+      scores.X = 0;
+      scores.O = 0;
+      updateScoreDisplay();
+    }
+
+    // Handle click on a cell
     function handleCellClick(index) {
-      if (!gameActive || board[index]) return; // Ignore if game is off or cell filled
+      // Ignore click if game is off or cell already filled
+      if (!gameActive || board[index]) return;
 
-      board[index] = currentPlayer; // Mark cell
-      renderBoard(); // Update UI
+      board[index] = currentPlayer; // Set symbol
+      renderBoard(); // Redraw board
 
-      // Check for a winner
+      // Check if current player won
       if (checkWinner()) {
         alert(`${players[currentPlayer]} wins!`);
+        scores[currentPlayer]++;
         gameActive = false;
+        updateScoreDisplay();
         return;
       }
 
-      // Check for a tie (no empty cells)
+      // Check for draw
       if (board.every(cell => cell !== "")) {
         alert("It's a tie!");
         gameActive = false;
         return;
       }
 
-      // Switch players
+      // Switch turns
       currentPlayer = currentPlayer === "X" ? "O" : "X";
     }
 
-    // Winning logic: 8 possible win lines
+    // Check for win condition
     function checkWinner() {
-      const wins = [
-        [0, 1, 2], // top row
-        [3, 4, 5], // middle row
-        [6, 7, 8], // bottom row
-        [0, 3, 6], // left column
-        [1, 4, 7], // middle column
-        [2, 5, 8], // right column
-        [0, 4, 8], // diagonal
-        [2, 4, 6], // reverse diagonal
+      const winCombos = [
+        [0,1,2],[3,4,5],[6,7,8], // rows
+        [0,3,6],[1,4,7],[2,5,8], // columns
+        [0,4,8],[2,4,6]          // diagonals
       ];
 
-      // Check each winning line
-      return wins.some(([a, b, c]) => board[a] && board[a] === board[b] && board[a] === board[c]);
+      // If any combo has same non-empty values, return true
+      return winCombos.some(([a, b, c]) =>
+        board[a] && board[a] === board[b] && board[a] === board[c]
+      );
     }
 
-    // Initial render of empty board
-    renderBoard();
+    // Update scoreboard
+    function updateScoreDisplay() {
+      scoreXEl.textContent = `${players.X} (X): ${scores.X}`;
+      scoreOEl.textContent = `${players.O} (O): ${scores.O}`;
+    }
+
+    // Live update for color changes
+    document.getElementById("xColor").addEventListener("input", renderBoard);
+    document.getElementById("oColor").addEventListener("input", renderBoard);
+    document.getElementById("boardColor").addEventListener("input", renderBoard);
+
+    renderBoard(); // Initial render on load
   </script>
+
 </body>
 </html>

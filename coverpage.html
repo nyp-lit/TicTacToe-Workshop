@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" /> 
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/> 
+  <title>Tic-Tac-Toe Cover</title> 
+
+  <style>
+    /* General page styling */
+    body {
+      margin: 0; 
+      font-family: Arial, sans-serif; 
+      text-align: center; 
+      display: flex;
+      flex-direction: column; 
+      min-height: 100vh; 
+    }
+
+    /* Top-bar styling */
+    .top-bar {
+      justify-content: center; 
+      align-items: center; 
+      background-color: #4A10A2; 
+      color: white; 
+      padding: 12px; 
+    }
+
+    /* Header section styling */
+    .header {
+      background-color: #5C2D91; 
+      color: white; 
+      padding: 10px; 
+      font-size: 20px; 
+    }
+
+    /* Main content styling */
+    .main-content {
+      flex: 1; 
+      display: flex; 
+      flex-direction: column; 
+      align-items: center; 
+      justify-content: center; 
+    }
+
+    /* Main heading styling */
+    h1 {
+      font-size: 48px; 
+      margin-bottom: 40px; 
+      color: black; 
+    }
+
+    /* Button styling */
+    .btn {
+      background-color: #4A10A2; 
+      color: #fff; 
+      border: none; 
+      padding: 10px 20px; 
+      font-size: 16px; 
+      font-weight: bold;
+      margin: 10px 5px; 
+      border-radius: 5px; 
+      cursor: pointer; 
+      width: 150px; 
+      display: inline-block; 
+    }
+
+    /* Button hover effect */
+    .btn:hover {
+      background-color: #3881FF;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Top bar section with logo -->
+  <div class="top-bar">
+    <img src="logo.png" alt="Logo" style="max-height: 45px;"/> 
+  </div>
+
+  <!-- Header section -->
+  <div class="header">Tic-Tac-Toe Demo</div>
+
+  <!-- Main content section with game title and buttons -->
+  <div class="main-content">
+    <h1>Tic-Tac-Toe Challenge: Let's Play!</h1> 
+    <button class="btn" onclick="location.href='toplay.html'">Play Game</button> 
+    <button class="btn" onclick="location.href='instructions.html'">How to Play</button> 
+  </div>
+</body>
+</html>

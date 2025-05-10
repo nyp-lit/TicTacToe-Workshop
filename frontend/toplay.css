@@ -1,0 +1,117 @@
+/* Basic reset and page styling */
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    text-align: center;
+}
+
+/* Top navigation bar */
+.top-bar {
+    background-color: #4A10A2;
+    color: white;
+    padding: 10px;
+    justify-content: flex-start;
+    align-items: center;
+    display: flex;
+}
+
+/* Header just below top bar */
+.header {
+    background-color: #5C2D91;
+    color: white;
+    padding: 10px;
+    font-size: 20px;
+    text-align: center;
+    font-family: 'Trebuchet MS', sans-serif;
+}
+
+.player-setup {
+    margin-top: 20px;
+}
+
+/* Player setup and color picker input styling */
+.player-setup input,
+.player-setup select,
+.player-setup label {
+    margin: 5px;
+    padding: 8px;
+}
+
+.color-picker {
+    margin: 10px 0;
+}
+
+/* Tic-Tac-Toe board layout */
+.game-board {
+    display: grid;
+    grid-template-columns: repeat(3, 100px);
+    /* 3 columns */
+    gap: 5px;
+    /* gap between cells */
+    justify-content: center;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+/* Individual cell (tile) styling */
+.cell {
+    width: 100px;
+    height: 100px;
+    font-size: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+/* Button styling */
+.btn {
+    padding: 10px 20px;
+    margin: 10px 5px;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+/* Unique button backgrounds */
+.btn-player1 {
+    background-color: #E66EBB;
+}
+
+.btn-player2 {
+    background-color: #5C2D91;
+}
+
+.btn-start {
+    background-color: #4A10A2;
+}
+
+.btn-reset {
+    background-color: #5C2D91;
+}
+
+.btn-scoreboard {
+    background-color: #E66EBB;
+}
+
+.btn-nav {
+    background-color: #4A10A2;
+}
+
+/* Hover effect for buttons */
+.btn:hover {
+    background-color: #3881FF;
+}
+
+/* Scoreboard styling */
+.scoreboard {
+    margin-top: 20px;
+}
+
+.scoreboard p {
+    font-size: 18px;
+}

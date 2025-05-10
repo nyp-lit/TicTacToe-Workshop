@@ -1,0 +1,115 @@
+    /* General page styling */
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+    }
+
+    /* Top-bar styling */
+    .top-bar {
+        background-color: #4A10A2;
+        color: white;
+        padding: 10px;
+        justify-content: flex-start;
+        align-items: center;
+        display: flex;
+    }
+
+    /* Header section styling */
+    .header {
+        background-color: #5C2D91;
+        color: white;
+        padding: 10px;
+        font-size: 20px;
+        text-align: center;
+        font-family: 'Trebuchet MS', sans-serif;
+    }
+
+    /* Main content styling */
+    .main-content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* Main heading styling */
+    h1 {
+        font-size: 42px;
+        margin-bottom: 40px;
+        color: black;
+    }
+
+    /* Button styling */
+    .btn {
+        background-color: #4A10A2;
+        color: #fff;
+        border: none;
+        padding: 10px 20px;
+        font-size: 16px;
+        font-weight: bold;
+        margin: 10px 5px;
+        border-radius: 5px;
+        cursor: pointer;
+        width: 150px;
+        display: inline-block;
+        transition: background-color 0.3s ease;
+    }
+
+    /* Button hover effect */
+    .btn:hover {
+        background-color: #3881FF;
+    }
+
+    /* Trophy cups styling */
+    .trophycups {
+        max-width: 200px;
+        margin-bottom: 10px;
+        animation: floatUpDown 3s ease-in-out infinite;
+    }
+
+    /* Floating animation for trophy cups, X and O */
+    @keyframes floatUpDown {
+        0% {
+            transform: translateY(0);
+        }
+
+        50% {
+            transform: translateY(-10px);
+            /* Move up */
+        }
+
+        100% {
+            transform: translateY(0);
+            /* Move back to original position */
+        }
+    }
+
+    .floating {
+        position: absolute;
+        font-size: 40px;
+        font-weight: bold;
+        animation: floatUpDown 4s ease-in-out infinite;
+        /* Loops the float animation */
+        pointer-events: none;
+        z-index: 1;
+    }
+
+    /* Purple X */
+    .floating-x {
+        color: rgba(74, 16, 162, 0.5);
+        /* Faint Purple */
+    }
+
+    /* Blue O */
+    .floating-o {
+        color: rgba(56, 129, 255, 0.5);
+        /* Faint Blue */
+    }
+
+
+    

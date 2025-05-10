@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Customizable Tic-Tac-Toe</title>
+  <link rel="stylesheet" href="toplay.css" />
+</head>
+
+<body>
+
+  <!-- Top Branding -->
+  <div class="top-bar">
+    <img src="logo.png" alt="Logo" style="max-height: 60px; margin-left: 20px;" />
+  </div>
+  <div class="header">Tic-Tac-Toe</div>
+
+  <!-- Player setup and color selection -->
+  <div class="player-setup">
+    <!-- Player 1 Input -->
+    <input type="text" id="player1" placeholder="Player 1 Name (X)" />
+    <button class="btn btn-player1" onclick="setPlayer(1)">Set Player 1</button><br />
+
+    <!-- Player 2 Input -->
+    <input type="text" id="player2" placeholder="Player 2 Name (O)" />
+    <button class="btn btn-player2" onclick="setPlayer(2)">Set Player 2</button><br />
+
+    <!-- Color Pickers -->
+    <div class="color-picker">
+      <label for="xColor">X Color: </label>
+      <input type="color" id="xColor" value="#E66EBB" />
+
+      <label for="oColor">O Color: </label>
+      <input type="color" id="oColor" value="#3881FF" />
+
+      <label for="boardColor">Board Background: </label>
+      <input type="color" id="boardColor" value="#4A10A2" />
+    </div>
+
+    <!-- Game control buttons -->
+    <button class="btn btn-start" onclick="startGame()">Start Game</button>
+    <button class="btn btn-reset" onclick="resetGame()">Reset Game</button>
+    <button class="btn btn-scoreboard" onclick="restartScoreboard()">Restart Scoreboard</button>
+  </div>
+
+  <!-- Scoreboard -->
+  <div class="scoreboard">
+    <h3>Scoreboard</h3>
+    <p id="scoreX">Player 1 (X): 0</p>
+    <p id="scoreO">Player 2 (O): 0</p>
+  </div>
+
+  <!-- Game board container -->
+  <div class="game-board" id="board"></div>
+
+  <!-- Navigation buttons -->
+  <button class="btn btn-nav" onclick="location.href='coverpage.html'">Back to Menu</button>
+  <button class="btn btn-nav" onclick="location.href='instructions.html'">How to Play</button>
+
+  <script src="toplay.js"></script>
+  
+
+</body>
+
+</html>

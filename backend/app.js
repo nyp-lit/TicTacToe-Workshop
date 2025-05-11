@@ -7,7 +7,7 @@ const app = express();
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
-app.use(express.static(path.join(__dirname, ''))); // To link to frontend 
+app.use(express.static(path.join(__dirname, '../tic-tac-toe-client')));
 
 wss.on('connection', function connection(ws) {
   ws.on('message', function incoming(message) {

@@ -20,11 +20,11 @@
   <div class="player-setup">
     <!-- Player 1 Input -->
     <input type="text" id="player1" placeholder="Player 1 Name (X)" />
-    <button class="btn btn-player1" onclick="setPlayer(1)">Set Player 1</button><br />
+    <button class="btn btn-player1">Set Player 1</button><br />
 
     <!-- Player 2 Input -->
     <input type="text" id="player2" placeholder="Player 2 Name (O)" />
-    <button class="btn btn-player2" onclick="setPlayer(2)">Set Player 2</button><br />
+    <button class="btn btn-player2">Set Player 2</button><br />
 
     <!-- Color Pickers -->
     <div class="color-picker">
@@ -39,9 +39,9 @@
     </div>
 
     <!-- Game control buttons -->
-    <button class="btn btn-start" onclick="startGame()">Start Game</button>
-    <button class="btn btn-reset" onclick="resetGame()">Reset Game</button>
-    <button class="btn btn-scoreboard" onclick="restartScoreboard()">Restart Scoreboard</button>
+    <button class="btn btn-start">Start Game</button>
+    <button class="btn btn-reset">Reset Game</button>
+    <button class="btn btn-scoreboard">Restart Scoreboard</button>
   </div>
 
   <!-- Scoreboard -->
@@ -58,10 +58,89 @@
   <button class="btn btn-nav" onclick="location.href='coverpage.html'">Back to Menu</button>
   <button class="btn btn-nav" onclick="location.href='instructions.html'">How to Play</button>
 
-  <script src="toplay.js"></script>
-  <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+  <!-- Scripts -->
+  <!-- Important to establish connections to socket.io for backend  -->
+<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+<script>
+  // Do not delete, important to establish the connection: 
+  const socket = io("http://localhost:3000");
 
+  // Board
+  const boardEl = document.getElementById("board");
+  const scoreXEl = document.getElementById("scoreX");
+  const scoreOEl = document.getElementById("scoreO");
+
+  let board = Array(9).fill("");
+  let currentPlayer = "X";
+  let gameActive = false;
+  let players = { X: "Player 1", O: "Player 2" };
+  let scores = { X: 0, O: 0 };
+
+  // Rendering of board
+  function renderBoard() {
+    boardEl.innerHTML = "";
+    const xColor = document.getElementById("xColor").value;
+    const oColor = document.getElementById("oColor").value;
+    const boardBg = document.getElementById("boardColor").value;
+
+    board.forEach((cell, i) => {
+      const cellEl = document.createElement("div");
+      cellEl.className = "cell";
+      cellEl.textContent = cell;
+      cellEl.style.backgroundColor = boardBg;
+      cellEl.style.color = cell === "X" ? xColor : cell === "O" ? oColor : "#000";
+      cellEl.onclick = () => {
+        if (gameActive && board[i] === "") {
+          console.log(`Player ${currentPlayer} clicked cell ${i}`);
+          // socket.emit("cellClick", i);
+        }
+      };
+      boardEl.appendChild(cellEl);
+    });
+  }
+
+  function updateScoreDisplay() {
+    scoreXEl.textContent = `${players.X} (X): ${scores.X}`;
+    scoreOEl.textContent = `${players.O} (O): ${scores.O}`;
+    console.log("Score updated:", scores);
+  }
+
+  // Event handlers for color updates
+  document.getElementById("xColor").addEventListener("input", renderBoard);
+  document.getElementById("oColor").addEventListener("input", renderBoard);
+  document.getElementById("boardColor").addEventListener("input", renderBoard);
+
+  // Player name setting
+  function setPlayer(num) {
+    const input = document.getElementById(`player${num}`);
+    const symbol = num === 1 ? "X" : "O";
+    const name = input.value || `Player ${num}`;
+    players[symbol] = name;
+    console.log(`Player ${symbol} set to "${name}"`);
+    // socket.emit("setPlayer", { symbol, name }); 
+    updateScoreDisplay();
+  }
+
+  document.querySelector(".btn-player1").addEventListener("click", () => setPlayer(1));
+  document.querySelector(".btn-player2").addEventListener("click", () => setPlayer(2));
+  document.querySelector(".btn-start").addEventListener("click", () => {
+    console.log("Start Game button clicked");
+    // socket.emit("startGame");
+  });
+  document.querySelector(".btn-reset").addEventListener("click", () => {
+    console.log("Reset Game button clicked");
+    // socket.emit("resetGame");
+  });
+  document.querySelector(".btn-scoreboard").addEventListener("click", () => {
+    console.log("Reset Scoreboard button clicked");
+    // socket.emit("restartScoreboard");
+  });
+
+// Backend: Add code that establish the connections 
+
+  // Initial render
+  renderBoard();
+</script>
 
 </body>
-
 </html>

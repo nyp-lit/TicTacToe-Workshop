@@ -19,19 +19,31 @@
 
   <!-- Main content area with instructions -->
   <div class="main-content">
-    <div class="container">
-      <!-- Instructions on how to play the game -->
+    <div class="instructions-container">
       <h1>How to Play</h1>
-      <p>1. The game is played on a 3x3 grid.</p>
-      <p>2. Player 1 is "X" and Player 2 is "O".</p>
-      <p>3. Players take turns putting their marks in empty squares.</p>
-      <p>4. The first player to get 3 of their marks in a row (vertically, horizontally, or diagonally) wins.</p>
-      <p>5. If all 9 squares are full and no player has won, the game ends in a tie.</p>
-
-      <!-- Navigation buttons -->
-      <button class="btn" onclick="location.href='coverpage.html'">Back to Menu</button>
-      <button class="btn" onclick="location.href='toplay.html'">Play Game</button>
+      <ul class="instructions">
+        <li>The game is played on a 3x3 grid.</li>
+        <li>Player 1 is "X" and Player 2 is "O".</li>
+        <li>Players take turns putting their marks in empty squares.</li>
+        <li>The first player to get 3 in a row wins (vertical, horizontal, or diagonal).</li>
+        <li>If all 9 squares are filled without a winner, it's a tie.</li>
+      </ul>
+      <div style="text-align: center;">
+        <button class="btn" onclick="location.href='coverpage.html'">Back to Menu</button>
+        <button class="btn" onclick="location.href='toplay.html'">Play Game</button>
+      </div>
     </div>
   </div>
+  
+  <!-- Floating Xs and Os -->
+  <div class="floating floating-o" style="top: 50%; left: 20%;">O</div>
+  <div class="floating floating-x" style="top: 40%; left: 25%;">X</div>
+  <div class="floating floating-o" style="top: 35%; left: 15%;">O</div>
+  <div class="floating floating-x" style="top: 70%; left: 80%;">X</div>
+  <div class="floating floating-o" style="top: 60%; left: 85%;">O</div>
+  <div class="floating floating-x" style="top: 55%; left: 75%;">X</div>
+  <!-- Floating Xs and Os placed at specific screen coordinates -->
+  <!-- These letters float up and down continuously using the floatUpDown animation -->
+
 </body>
 </html>

@@ -4,16 +4,36 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Tic-Tac-Toe Cover</title>
-  <link rel="stylesheet" href="coverpage.css" />
-<link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+  <title>Tic-Tac-Toe</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
 </head>
 
 <body>
   <!-- Top bar section with logo -->
   <div class="top-bar">
-    <img src="logo.png" alt="Logo" style="max-height: 60px; margin-left: 20px;" />
+    <img src="logo.png" alt="Tic-Tac-Toe Logo" class="logo" />
   </div>
 
-  <!-- Header section ( change the name as its different pages ) -->
-  <div class="header">Tic-Tac-Toe</div>
+  <!-- Header section - dynamic title -->
+  <div class="header">
+    <h1 id="page-title">Tic-Tac-Toe</h1>
+  </div>
+
+  <!-- Main content section - this will be different on each page -->
+  <main class="main-content" id="main-content">
+    <!-- Content will be inserted here by each page -->
+  </main>
+
+  <!-- Floating Xs and Os background elements -->
+  <div id="floating-container">
+    <div class="floating floating-o" style="top: 50%; left: 20%;">O</div>
+    <div class="floating floating-x" style="top: 40%; left: 25%;">X</div>
+    <div class="floating floating-o" style="top: 35%; left: 15%;">O</div>
+    <div class="floating floating-x" style="top: 70%; left: 80%;">X</div>
+    <div class="floating floating-o" style="top: 60%; left: 85%;">O</div>
+    <div class="floating floating-x" style="top: 55%; left: 75%;">X</div>
+  </div>
+  
+</body>
+</html>

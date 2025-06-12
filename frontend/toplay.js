@@ -177,3 +177,4 @@ for (let i = 0; i < total; i++) {
 
   container.appendChild(span);
 }
+

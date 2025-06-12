@@ -32,7 +32,7 @@
     <div class="floating floating-o" style="top: 35%; left: 15%;">O</div>
     <div class="floating floating-x" style="top: 70%; left: 80%;">X</div>
     <div class="floating floating-o" style="top: 60%; left: 85%;">O</div>
-    <div class="floating floating-x" style="top: 55%; left: 75%;">X</div>
+    <div class="floating floating-x" style="top: 55%; left: 75%;">X</div>    
   </div>
   
 </body>

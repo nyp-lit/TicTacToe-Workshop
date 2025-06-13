@@ -1,6 +1,6 @@
 const express = require("express");
 const http = require("http");
-const path = require("path");
+const path = require("path");   
 const { Server } = require("socket.io");
 
 const app = express();
@@ -8,19 +8,38 @@ const server = http.createServer(app);
 const io = new Server(server);
 const PORT = 3000;
 
+// Serve static files from the "frontend" folder
+// This path now correctly navigates UP one directory (..) from 'backend'
+// and then INTO the 'frontend' directory.
+app.use(express.static(path.join(__dirname, "..", "frontend")));
 
-// Serve static files from the "public" folder
-app.use(express.static(path.join(__dirname, "frontend")));
+// Add a route to specifically serve toplay.html for the root URL
+// This path also needs to be adjusted to go UP one directory (..)
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, "..", "frontend", "toplay.html"));
+});
 
 // Game state
 let players = { X: "", O: "" };
 let board = Array(9).fill("");
 let currentPlayer = "X";
 let gameActive = false;
+let scores = { X: 0, O: 0 }; // Added for server-side scorekeeping
 
 // Listen for socket connections
 io.on("connection", (socket) => {
     console.log("A player connected:", socket.id);
+
+    // When a new client connects, send them the current game state
+    socket.emit("gameUpdate", {
+        board,
+        currentPlayer,
+        gameActive,
+        players,
+        winner: checkWinner(), // Check if a game is already won
+        draw: board.every(cell => cell !== "") && !checkWinner(), // Check for draw
+        scores // Send current scores
+    });
 
     // Start game with player names
     socket.on("startGame", ({ player1, player2 }) => {
@@ -36,7 +55,8 @@ io.on("connection", (socket) => {
             gameActive,
             players,
             winner: null,
-            draw: false
+            draw: false,
+            scores // Include scores
         });
     });
 
@@ -46,9 +66,13 @@ io.on("connection", (socket) => {
 
         board[index] = currentPlayer;
         const winner = checkWinner();
-        const draw = board.every(cell => cell !== "");
+        const draw = board.every(cell => cell !== "") && !winner; // Ensure not a draw if there's a winner
 
         gameActive = !(winner || draw);
+
+        if (winner) {
+            scores[winner]++; // Increment score for the winner
+        }
 
         io.emit("gameUpdate", {
             board,
@@ -56,7 +80,8 @@ io.on("connection", (socket) => {
             gameActive,
             winner,
             draw,
-            players
+            players,
+            scores // Include scores
         });
 
         if (gameActive) {
@@ -67,7 +92,7 @@ io.on("connection", (socket) => {
     socket.on("resetGame", () => {
         board = Array(9).fill("");
         currentPlayer = "X";
-        gameActive = false;
+        gameActive = false; // Game is not active until 'Start Game' is clicked again
 
         io.emit("gameUpdate", {
             board,
@@ -75,8 +100,27 @@ io.on("connection", (socket) => {
             gameActive,
             players,
             winner: null,
-            draw: false
+            draw: false,
+            scores // Include scores
         });
+    });
+
+    // Handle restart scoreboard (clears scores on the server)
+    socket.on("restartScoreboard", () => {
+        scores = { X: 0, O: 0 };
+        io.emit("gameUpdate", {
+            board,
+            currentPlayer,
+            gameActive,
+            players,
+            winner: null,
+            draw: false,
+            scores // Send updated (cleared) scores
+        });
+    });
+
+    socket.on("disconnect", () => {
+        console.log("A player disconnected:", socket.id);
     });
 });
 
@@ -101,9 +145,6 @@ function switchPlayer(player) {
 }
 
 // Start server
-
-
 server.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
 });
-

@@ -1,133 +1,188 @@
-// Game state
-let board = Array(9).fill("");
-let currentPlayer = "X";
-let gameActive = false;
-let players = { X: "Player 1", O: "Player 2" };
-let scores = { X: 0, O: 0 };
+// toplay.js
 
-// Elements
-const boardEl = document.getElementById("board");
-const scoreXEl = document.getElementById("scoreX");
-const scoreOEl = document.getElementById("scoreO");
+// Initialize Socket.IO client
+const socket = io();
 
-// Initialize the game board
-function initializeBoard() {
-  boardEl.innerHTML = "";
-  for (let i = 0; i < 9; i++) {
-    const cell = document.createElement("div");
-    cell.className = "cell";
-    cell.dataset.index = i;
-    cell.addEventListener("click", () => handleCellClick(i));
-    boardEl.appendChild(cell);
-  }
-}
+// DOM elements
+const player1Input = document.getElementById('player1');
+const player2Input = document.getElementById('player2');
+const xColorPicker = document.getElementById('xColor');
+const oColorPicker = document.getElementById('oColor');
+const boardColorPicker = document.getElementById('boardColor');
+const gameBoard = document.getElementById('board');
+const scoreXElement = document.getElementById('scoreX'); // Changed ID to avoid conflict with `scores.X`
+const scoreOElement = document.getElementById('scoreO'); // Changed ID to avoid conflict with `scores.O`
 
-function renderBoard() {
-  const cells = document.querySelectorAll(".cell");
-  const xColor = document.getElementById("xColor").value;
-  const oColor = document.getElementById("oColor").value;
-  const boardBg = document.getElementById("boardColor").value;
-  
-  // Remove this line that sets board background
-  // boardEl.style.backgroundColor = boardBg;
-  
-  board.forEach((cell, i) => {
-    cells[i].textContent = cell;
-    cells[i].style.color = cell === "X" ? xColor : cell === "O" ? oColor : "transparent";
-    // Set the background color for each cell
-    cells[i].style.backgroundColor = boardBg;
-  });
-}
-// Player naming
-function setPlayer(num) {
-  const input = document.getElementById(`player${num}`);
-  players[num === 1 ? "X" : "O"] = input.value.trim() || (num === 1 ? "Player 1" : "Player 2");
-  updateScoreDisplay();
-}
+let currentPlayerLocal = "X"; // This will be updated by gameUpdate from server
+let players = { X: "Player 1", O: "Player 2" }; // Default, updated by server
+let currentScores = { X: 0, O: 0 }; // Stores scores from the server
 
-// Control buttons
+// --- Functions to emit events to the server ---
+
+/**
+ * Sends a request to the backend to start a new game.
+ * Uses player names from the input fields.
+ */
 function startGame() {
-  board.fill("");
-  currentPlayer = "X";
-  gameActive = true;
-  renderBoard();
+    // Get player names
+    const p1Name = player1Input.value || "Player 1 (X)";
+    const p2Name = player2Input.value || "Player 2 (O)";
+
+    // Emit the startGame event to the server
+    socket.emit('startGame', { player1: p1Name, player2: p2Name });
 }
 
+/**
+ * Sends a player's move to the backend.
+ * @param {number} index - The index of the clicked cell (0-8).
+ */
+function playMove(index) {
+    // Emit the playMove event to the server with the cell index and current player
+    socket.emit('playMove', { index: index, player: currentPlayerLocal });
+}
+
+/**
+ * Sends a request to the backend to reset the game board.
+ */
 function resetGame() {
-  board.fill("");
-  gameActive = false;
-  renderBoard();
+    socket.emit('resetGame');
 }
 
+/**
+ * Sends a request to the backend to restart (clear) the scoreboard.
+ */
 function restartScoreboard() {
-  scores.X = scores.O = 0;
-  updateScoreDisplay();
+    socket.emit('restartScoreboard');
 }
 
-function updateScoreDisplay() {
-  scoreXEl.textContent = `${players.X} (X): ${scores.X}`;
-  scoreOEl.textContent = `${players.O} (O): ${scores.O}`;
+/**
+ * This function is defined in HTML but isn't strictly necessary for backend interaction.
+ * It's more of a local UI update if you were to change player names dynamically.
+ */
+function setPlayer(playerNum) {
+    // The player names are sent to the server via the startGame function.
+    // This function can be left as is or adapted if you add client-side dynamic name display.
+    console.log(`Player ${playerNum} name input focused.`);
 }
 
-// Game interaction
-function handleCellClick(idx) {
-  if (!gameActive || board[idx]) return;
-  
-  board[idx] = currentPlayer;
-  renderBoard();
+// --- Functions to handle events from the server (gameUpdate) ---
 
-  if (checkWinner()) {
-    setTimeout(() => {
-      alert(`${players[currentPlayer]} wins!`);
-      scores[currentPlayer]++;
-      gameActive = false;
-      updateScoreDisplay();
-    }, 10);
-    return;
-  }
-  
-  if (board.every(c => c)) {
-    setTimeout(() => {
-      alert("It's a tie!");
-      gameActive = false;
-    }, 10);
-    return;
-  }
-  
-  currentPlayer = currentPlayer === "X" ? "O" : "X";
+/**
+ * Handles 'gameUpdate' events from the server, rendering the new game state.
+ * @param {object} data - The game state data from the server.
+ */
+socket.on('gameUpdate', (data) => {
+    const { board, currentPlayer, gameActive, winner, draw, players: updatedPlayers, scores: serverScores } = data;
+
+    // Update local state based on server data
+    currentPlayerLocal = currentPlayer;
+    players = updatedPlayers;
+    currentScores = serverScores; // Update scores from the server
+
+    // Update player name placeholders and scoreboard
+    player1Input.placeholder = `${players.X} (X)`;
+    player2Input.placeholder = `${players.O} (O)`;
+    scoreXElement.textContent = `${players.X} (X): ${currentScores.X}`;
+    scoreOElement.textContent = `${players.O} (O): ${currentScores.O}`;
+
+    // Apply colors from pickers to CSS variables for dynamic styling
+    document.documentElement.style.setProperty('--x-color', xColorPicker.value);
+    document.documentElement.style.setProperty('--o-color', oColorPicker.value);
+    document.documentElement.style.setProperty('--board-bg', boardColorPicker.value);
+
+    // Render the game board
+    gameBoard.innerHTML = ''; // Clear previous board cells
+    board.forEach((cell, index) => {
+        const cellDiv = document.createElement('div');
+        cellDiv.classList.add('cell');
+        cellDiv.textContent = cell;
+
+        // Add click listener only if the game is active and the cell is empty
+        if (gameActive && !cell) {
+            cellDiv.addEventListener('click', () => playMove(index));
+        }
+
+        // Set cell background to chosen board color
+        cellDiv.style.backgroundColor = boardColorPicker.value;
+
+        // Apply colors to X and O symbols based on current settings
+        if (cell === 'X') {
+            cellDiv.style.color = xColorPicker.value;
+        } else if (cell === 'O') {
+            cellDiv.style.color = oColorPicker.value;
+        }
+        gameBoard.appendChild(cellDiv);
+    });
+
+    // Display game status (winner, draw, current player)
+    let statusMessage = '';
+    if (winner) {
+        statusMessage = `${players[winner]} (${winner}) wins! 🎉`;
+        // You might want a dedicated element to display this message instead of an alert
+        setTimeout(() => alert(statusMessage), 100); // Small delay for alert
+    } else if (draw) {
+        statusMessage = "It's a draw! 🤝";
+        setTimeout(() => alert(statusMessage), 100); // Small delay for alert
+    } else if (gameActive) {
+        // You might want a dedicated element to display whose turn it is
+        statusMessage = `Current Turn: ${players[currentPlayer]} (${currentPlayer})`;
+        console.log(statusMessage); // For debugging
+    } else {
+        statusMessage = "Game not active. Click 'Start Game' to begin!";
+        console.log(statusMessage); // For debugging
+    }
+
+    // Disable board interaction if game is not active or over
+    if (!gameActive || winner || draw) {
+        gameBoard.classList.add('disabled'); // Add a CSS class to visually disable interaction
+    } else {
+        gameBoard.classList.remove('disabled');
+    }
+});
+
+
+// --- Initial Setup on Page Load ---
+document.addEventListener('DOMContentLoaded', () => {
+    // Set initial colors from HTML values to CSS variables
+    document.documentElement.style.setProperty('--x-color', xColorPicker.value);
+    document.documentElement.style.setProperty('--o-color', oColorPicker.value);
+    document.documentElement.style.setProperty('--board-bg', boardColorPicker.value);
+
+    // Add event listeners for color pickers to update styles in real-time
+    xColorPicker.addEventListener('input', (event) => {
+        document.documentElement.style.setProperty('--x-color', event.target.value);
+    });
+    oColorPicker.addEventListener('input', (event) => {
+        document.documentElement.style.setProperty('--o-color', event.target.value);
+    });
+    boardColorPicker.addEventListener('input', (event) => {
+        document.documentElement.style.setProperty('--board-bg', event.target.value);
+    });
+
+    // Initially, fetch the game state from the server when the client connects
+    // The backend's 'connection' handler will automatically send a gameUpdate
+    // when a new client connects, so we don't need a specific 'requestGameState' event from client.
+});
+const container = document.getElementById('floating-container');
+const symbols = ['X', 'O'];
+const total = 20; // Number of floating elements
+
+for (let i = 0; i < total; i++) {
+  const span = document.createElement('div');
+  const symbol = symbols[Math.floor(Math.random() * symbols.length)];
+  span.textContent = symbol;
+  span.classList.add('floating');
+  span.classList.add(symbol === 'X' ? 'floating-x' : 'floating-o');
+
+  // Random position within viewport
+  const top = Math.random() * 90; // top: 0% to 90%
+  const left = Math.random() * 95; // left: 0% to 95%
+  span.style.top = `${top}%`;
+  span.style.left = `${left}%`;
+
+  // Random animation duration and delay
+  span.style.animationDuration = `${3 + Math.random() * 3}s`;
+  span.style.animationDelay = `${Math.random() * 2}s`;
+
+  container.appendChild(span);
 }
-
-function checkWinner() {
-  const winPatterns = [
-    [0, 1, 2], [3, 4, 5], [6, 7, 8], // rows
-    [0, 3, 6], [1, 4, 7], [2, 5, 8], // columns
-    [0, 4, 8], [2, 4, 6]             // diagonals
-  ];
-
-  return winPatterns.some(pattern => {
-    const [a, b, c] = pattern;
-    return board[a] && board[a] === board[b] && board[a] === board[c];
-  });
-}
-
-// Floating background symbols
-function createFloatingSymbols() {
-  const container = document.getElementById('floating-container');
-  container.innerHTML = '';
-  
-  for (let i = 0; i < 10; i++) {
-    const symbol = Math.random() > 0.5 ? 'X' : 'O';
-    const div = document.createElement('div');
-    div.textContent = symbol;
-    div.className = `floating floating-${symbol.toLowerCase()}`;
-    div.style.top = `${Math.random() * 90}%`;
-    div.style.left = `${Math.random() * 95}%`;
-    div.style.animationDuration = `${3 + Math.random() * 4}s`;
-    container.appendChild(div);
-  }
-}
-
-// Initialize the game
-initializeBoard();
-createFloatingSymbols();
-updateScoreDisplay();

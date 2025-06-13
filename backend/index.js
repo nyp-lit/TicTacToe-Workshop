@@ -8,46 +8,41 @@ const server = http.createServer(app);
 const io = new Server(server);
 const PORT = 3000;
 
-// Serve static files from the "frontend" folder
-// This path now correctly navigates UP one directory (..) from 'backend'
-// and then INTO the 'frontend' directory.
 app.use(express.static(path.join(__dirname, "..", "frontend")));
 
-// Add a route to specifically serve toplay.html for the root URL
-// This path also needs to be adjusted to go UP one directory (..)
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, "..", "frontend", "toplay.html"));
 });
 
-// Game state
 let players = { X: "", O: "" };
 let board = Array(9).fill("");
 let currentPlayer = "X";
 let gameActive = false;
-let scores = { X: 0, O: 0 }; // Added for server-side scorekeeping
+let scores = { X: 0, O: 0 };
 
-// Listen for socket connections
 io.on("connection", (socket) => {
     console.log("A player connected:", socket.id);
 
-    // When a new client connects, send them the current game state
     socket.emit("gameUpdate", {
         board,
         currentPlayer,
         gameActive,
         players,
-        winner: checkWinner(), // Check if a game is already won
-        draw: board.every(cell => cell !== "") && !checkWinner(), // Check for draw
-        scores // Send current scores
+        winner: checkWinner(),
+        draw: board.every(cell => cell !== "") && !checkWinner(),
+        scores
     });
 
-    // Start game with player names
+    console.log("Initial game state sent to:", socket.id);
+
     socket.on("startGame", ({ player1, player2 }) => {
         players.X = player1 || "Player 1";
         players.O = player2 || "Player 2";
         board = Array(9).fill("");
         currentPlayer = "X";
         gameActive = true;
+
+        console.log(`Game started: ${players.X} (X) vs ${players.O} (O)`);
 
         io.emit("gameUpdate", {
             board,
@@ -56,22 +51,31 @@ io.on("connection", (socket) => {
             players,
             winner: null,
             draw: false,
-            scores // Include scores
+            scores
         });
+
+        console.log("Game update emitted after startGame.");
     });
 
-    // Handle move
     socket.on("playMove", ({ index, player }) => {
-        if (!gameActive || board[index] || player !== currentPlayer) return;
+        console.log(`playMove received from ${player} at index ${index}`);
+
+        if (!gameActive || board[index] || player !== currentPlayer) {
+            console.log("Invalid move or game not active. Ignored.");
+            return;
+        }
 
         board[index] = currentPlayer;
         const winner = checkWinner();
-        const draw = board.every(cell => cell !== "") && !winner; // Ensure not a draw if there's a winner
+        const draw = board.every(cell => cell !== "") && !winner;
 
         gameActive = !(winner || draw);
 
         if (winner) {
-            scores[winner]++; // Increment score for the winner
+            scores[winner]++;
+            console.log(`Player ${winner} wins!`);
+        } else if (draw) {
+            console.log("Game ended in a draw.");
         }
 
         io.emit("gameUpdate", {
@@ -81,8 +85,10 @@ io.on("connection", (socket) => {
             winner,
             draw,
             players,
-            scores // Include scores
+            scores
         });
+
+        console.log("Game update emitted after playMove.");
 
         if (gameActive) {
             currentPlayer = switchPlayer(currentPlayer);
@@ -92,7 +98,9 @@ io.on("connection", (socket) => {
     socket.on("resetGame", () => {
         board = Array(9).fill("");
         currentPlayer = "X";
-        gameActive = false; // Game is not active until 'Start Game' is clicked again
+        gameActive = false;
+
+        console.log("Game reset by", socket.id);
 
         io.emit("gameUpdate", {
             board,
@@ -101,13 +109,17 @@ io.on("connection", (socket) => {
             players,
             winner: null,
             draw: false,
-            scores // Include scores
+            scores
         });
+
+        console.log("Game update emitted after resetGame.");
     });
 
-    // Handle restart scoreboard (clears scores on the server)
     socket.on("restartScoreboard", () => {
         scores = { X: 0, O: 0 };
+
+        console.log("Scoreboard reset by", socket.id);
+
         io.emit("gameUpdate", {
             board,
             currentPlayer,
@@ -115,8 +127,10 @@ io.on("connection", (socket) => {
             players,
             winner: null,
             draw: false,
-            scores // Send updated (cleared) scores
+            scores
         });
+
+        console.log("Game update emitted after restartScoreboard.");
     });
 
     socket.on("disconnect", () => {
@@ -124,7 +138,6 @@ io.on("connection", (socket) => {
     });
 });
 
-// Helpers
 function checkWinner() {
     const winCombos = [
         [0, 1, 2], [3, 4, 5], [6, 7, 8],
@@ -134,7 +147,7 @@ function checkWinner() {
 
     for (let [a, b, c] of winCombos) {
         if (board[a] && board[a] === board[b] && board[a] === board[c]) {
-            return board[a]; // Return "X" or "O"
+            return board[a];
         }
     }
     return null;
@@ -144,7 +157,6 @@ function switchPlayer(player) {
     return player === "X" ? "O" : "X";
 }
 
-// Start server
 server.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
 });

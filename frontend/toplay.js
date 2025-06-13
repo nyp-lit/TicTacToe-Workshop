@@ -30,7 +30,11 @@ function startGame() {
 
     // Emit the startGame event to the server
     socket.emit('startGame', { player1: p1Name, player2: p2Name });
+
+    // Show popup message
+    alert(`Game has started!\n${p1Name} (X) vs ${p2Name} (O)`);
 }
+
 
 /**
  * Sends a player's move to the backend.

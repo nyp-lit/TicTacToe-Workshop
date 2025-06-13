@@ -1,7 +1,7 @@
 {
   "name": "tictactoe-workshop-main",
   "version": "1.0.0",
-  "main": "app.js",
+  "main": "index.js",
   "dependencies": {
     "accepts": "^2.0.0",
     "body-parser": "^2.2.0",
@@ -73,7 +73,7 @@
     "ws": "^8.18.2"
   },
   "scripts": {
-    "start": "node TicTacToe-Workshop-main/backend/app.js",
+    "start": "node TicTacToe-Workshop-main/backend/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],

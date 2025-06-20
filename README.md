@@ -1,9 +1,32 @@
-TicTacToe Workshop 2025:
-A hands-on learning experience designed to introduce participants to full-stack web development through the creation of a real-time multiplayer Tic Tac Toe game. This workshop guides partipants through both frontend and backend theory and practical.
+Tic Tac Toe Workshop 2025
+A hands-on learning experience introducing participants to web development through the creation of a real-time multiplayer Tic Tac Toe game.
 
-Backend:
-Participants will learn how to set up a Node.js-based backend environment, configure essential modules, and integrate WebSocket functionality The session includes step-by-step guidance using Visual Studio Code, with focus on proper dependency management and project structure.
+🔧 Backend Development
+Participants will learn how to:
 
-Core Dependencies:
-cors: Enables cross-origin resource sharing for secure communication between client and server.
-(Other dependencies include express, socket.io, etc)
+Set up a Node.js-based backend environment.
+
+Configure essential modules such as express, cors, and socket.io.
+
+Integrate WebSocket functionality using socket.io for real-time communication.
+
+Manage project structure and dependencies using Visual Studio Code and npm.
+
+🎨 Frontend Development
+Participants will build a simple user interface using:
+
+HTML for structure
+
+CSS for styling
+
+JavaScript for interactivity and real-time functionality of tic tac toe game 
+
+📦 Core Dependencies
+express: Fast, minimalist web framework for Node.js.
+
+cors: Enables secure cross-origin requests between the frontend and backend.
+
+socket.io: Adds real-time, bi-directional communication capabilities.
+
+(Additional utilities and tools will be introduced throughout the session.)
+
